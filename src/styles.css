@@ -60,6 +60,7 @@ p { margin: 0; }
 .card.flush { padding: 0; overflow: hidden; }
 .list > * + * { border-top: 1px solid var(--line); }
 .list-row { display: flex; align-items: center; gap: 12px; padding: 14px 20px; }
+button.list-row { width: 100%; border: 0; background: none; cursor: pointer; text-align: left; }
 .section-title { font-size: 13px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .04em; margin: 8px 4px; }
 
 /* Botones */

@@ -137,8 +137,8 @@ export default function ManagePage() {
 
         {active && (
           <div className="card flush list">
-            <button className="list-row link" style={{ textDecoration: 'none', width: '100%', border: 0, background: 'none', cursor: 'pointer' }} onClick={() => setCalendar(true)}>
-              <span aria-hidden>📅</span><span className="grow" style={{ textAlign: 'left' }}>Agregar a mi calendario</span><span className="muted">›</span>
+            <button className="list-row" onClick={() => setCalendar(true)}>
+              <span aria-hidden>📅</span><span className="grow">Agregar a mi calendario</span><span className="muted">›</span>
             </button>
             {b.business.phone && (
               <a className="list-row" style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer"
