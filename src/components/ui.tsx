@@ -68,8 +68,7 @@ export function TopBar({ url, back, right }: { url?: string; back?: { to: string
           <Link className="btn ghost small" to={back.to}>‹ {back.label}</Link>
         ) : (
           <Link to="/" className="row" style={{ textDecoration: 'none', gap: 8 }}>
-            <img src="/icon.png" alt="" width={26} height={26} style={{ borderRadius: 7 }} />
-            <strong>Agendin</strong>
+            <img src="/logo-horizontal.png" alt="Agendin" height={30} style={{ height: 30, width: 'auto' }} />
           </Link>
         )}
         <div className="grow url center">{url}</div>
@@ -101,10 +100,17 @@ export function Loading({ lines = 3 }: { lines?: number }) {
   )
 }
 
+const mascotFor: Record<string, string> = { '🔎': 'worried', '🔗': 'worried', '📄': 'worried', '⏸': 'sleep', '📅': 'sleep' }
+
+export function Mascot({ kind, size = 160 }: { kind: 'wave' | 'celebrate' | 'sleep' | 'worried'; size?: number }) {
+  return <img src={`/mascot-${kind}.png`} alt="" width={size} style={{ height: 'auto', margin: '0 auto' }} />
+}
+
 export function Empty({ icon, title, text, children }: { icon: string; title: string; text?: string; children?: ReactNode }) {
+  const m = mascotFor[icon]
   return (
     <div className="stack center" style={{ padding: '56px 8px', alignItems: 'center' }}>
-      <div style={{ fontSize: 44 }} aria-hidden>{icon}</div>
+      {m ? <Mascot kind={m as 'sleep'} size={150} /> : <div style={{ fontSize: 44 }} aria-hidden>{icon}</div>}
       <h2>{title}</h2>
       {text && <p className="muted" style={{ maxWidth: 420 }}>{text}</p>}
       {children}

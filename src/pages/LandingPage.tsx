@@ -27,7 +27,7 @@ export default function LandingPage() {
       <TopBar right={<a className="btn small" href="#planes">Empezar</a>} />
       <main className="page">
         <section className="hero">
-          <img className="mascot" src="/mascot.png" alt="" onError={(e) => (e.currentTarget.style.display = 'none')} />
+          <img className="mascot" src="/mascot-wave.png" alt="" />
           <h1>Tu agenda llena,<br />sin el desorden.</h1>
           <p>Agendin es la app de reservas para barberías, salones, spas y consultorios. Tus clientes reservan desde un enlace y tú gestionas todo desde el iPhone.</p>
           <div className="row" style={{ justifyContent: 'center' }}>

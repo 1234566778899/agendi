@@ -65,7 +65,7 @@ export default function ManagePage() {
       <div className="page narrow stack-lg" style={{ paddingTop: 24 }}>
         {isNew && active && (
           <div className="stack center">
-            <div className={`hero-check badge ${b.status === 'confirmed' ? 'green' : 'orange'}`}>{b.status === 'confirmed' ? '✓' : '⏳'}</div>
+            <img src={b.status === 'confirmed' ? '/mascot-celebrate.png' : '/mascot-wave.png'} alt="" width={150} style={{ margin: '0 auto', height: 'auto' }} />
             <h1>{b.status === 'confirmed' ? '¡Reserva confirmada!' : needsPayment ? 'Falta tu pago' : 'Solicitud enviada'}</h1>
             <p className="muted">
               {b.status === 'confirmed' ? `Te esperamos el ${longDay(b.starts_at, tz).toLowerCase()} a las ${time(b.starts_at, tz)}`
