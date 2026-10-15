@@ -68,7 +68,8 @@ export function TopBar({ url, back, right }: { url?: string; back?: { to: string
           <Link className="btn ghost small" to={back.to}>‹ {back.label}</Link>
         ) : (
           <Link to="/" className="row" style={{ textDecoration: 'none', gap: 8 }}>
-            <img src="/logo-horizontal.png" alt="Agendin" height={30} style={{ height: 30, width: 'auto' }} />
+            <img src="/mascot-wave.png" alt="" height={30} style={{ height: 30, width: 'auto' }} />
+            <strong style={{ fontSize: 18, letterSpacing: '-0.02em' }}>Agendin</strong>
           </Link>
         )}
         <div className="grow url center">{url}</div>
