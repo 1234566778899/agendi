@@ -2,7 +2,8 @@ export type Service = {
   id: string; name: string; description: string | null; duration_min: number; price: number; price_today: number
   category_id: string | null; payment_mode: 'on_site' | 'deposit' | 'prepaid'; deposit_amount: number | null; image_path: string | null
 }
-export type StaffMember = { id: string; name: string; specialty: string | null; avatar_path: string | null; service_ids: string[] }
+export type StaffKind = 'person' | 'space' | 'equipment'
+export type StaffMember = { id: string; name: string; kind: StaffKind; specialty: string | null; avatar_path: string | null; service_ids: string[] }
 export type Package = { id: string; name: string; description: string | null; price: number; service_ids: string[] }
 export type Promotion = { name: string; discount_type: 'percent' | 'fixed'; discount_value: number; service_ids: string[]; weekdays: number[] }
 export type Business = {
@@ -23,7 +24,7 @@ export type BookingResult = {
 }
 export type Booking = {
   reference: string; status: 'pending' | 'confirmed' | 'completed' | 'no_show' | 'cancelled' | 'rejected'
-  starts_at: string; ends_at: string; price: number; service: string; service_id: string; staff: string; staff_id: string
+  starts_at: string; ends_at: string; price: number; service: string; service_id: string; staff: string; staff_id: string; staff_kind?: StaffKind
   business: { name: string; slug: string; address: string | null; city: string | null; phone: string | null; timezone: string; logo_path: string | null; category: string; booking_open: boolean }
   can_change: boolean; change_deadline: string; reschedules_left: number; allow_cancel: boolean; allow_reschedule: boolean
   pending_expires_at: string | null; cancel_reason: string | null

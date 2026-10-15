@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AppError, rpc } from '../lib/supabase'
-import { addDays, dayTime, duration, longDay, money, time, todayIn, toE164 } from '../lib/format'
+import { addDays, dayTime, duration, longDay, money, time, todayIn, toE164, unitNoun, withUnit } from '../lib/format'
 import type { BookingResult, Business, Service, Slot } from '../lib/types'
 import { Avatar, Calendar, Empty, Loading, Modal, SlotGrid, TopBar } from '../components/ui'
 import { useBusiness } from './BusinessPage'
 
 type Step = 1 | 2 | 3 | 4 | 5
-const stepNames = ['Servicio', 'Profesional', 'Fecha', 'Datos', 'Confirmar']
 
 export default function BookingPage() {
   const { slug } = useParams()
@@ -35,6 +34,8 @@ export default function BookingPage() {
   const totalMin = services.reduce((a, s) => a + s.duration_min, 0)
   const total = pkg ? Number(pkg.price) : services.reduce((a, s) => a + Number(s.price_today), 0)
   const staff = eligibleStaff.find((m) => m.id === staffId)
+  const noun = unitNoun(eligibleStaff.length ? eligibleStaff.map((m) => m.kind) : biz?.staff.map((m) => m.kind) ?? [])
+  const stepNames = ['Servicio', noun.title, 'Fecha', 'Datos', 'Confirmar']
   const assignedStaff = start ? biz?.staff.find((m) => m.id === slots?.find((s) => s.starts_at === start)?.staff_id) : undefined
   const needsPayment = services.some((s) => s.payment_mode !== 'on_site')
 
@@ -100,7 +101,7 @@ export default function BookingPage() {
     <div className="card stack" style={{ gap: 4 }}>
       <h3 style={{ marginBottom: 6 }}>{pkg?.name ?? services.map((s) => s.name).join(' + ')}</h3>
       <div className="summary-row"><span>Duración</span><span>{duration(totalMin)}</span></div>
-      <div className="summary-row"><span>Profesional</span><span>{staff?.name ?? assignedStaff?.name ?? 'Cualquiera disponible'}</span></div>
+      <div className="summary-row"><span>{noun.title}</span><span>{staff?.name ?? assignedStaff?.name ?? 'Cualquiera disponible'}</span></div>
       {start && <div className="summary-row"><span>Fecha</span><span>{dayTime(start, tz)}</span></div>}
       <div className="summary-row" style={{ borderTop: '1px solid var(--line)', marginTop: 6, paddingTop: 12 }}>
         <span>Total</span><span>{money(total)}</span>
@@ -132,18 +133,18 @@ export default function BookingPage() {
           <div className="stack-lg">
             {step === 2 && (
               <section className="stack">
-                <h1 style={{ fontSize: 26 }}>¿Con quién quieres tu cita?</h1>
+                <h1 style={{ fontSize: 26 }}>{noun.question}</h1>
                 <button className={`pick ${staffId === null ? 'on' : ''}`} onClick={() => setStaffId(null)}>
                   <div className="avatar" style={{ width: 48, height: 48 }}>?</div>
-                  <div className="grow"><h3>Cualquier profesional disponible</h3><p className="muted small">Te asignamos a quien tenga el horario libre.</p></div>
+                  <div className="grow"><h3>{noun.any}</h3><p className="muted small">{noun.anyHint}</p></div>
                 </button>
                 {eligibleStaff.map((m) => (
                   <button key={m.id} className={`pick ${staffId === m.id ? 'on' : ''}`} onClick={() => setStaffId(m.id)}>
-                    <Avatar name={m.name} path={m.avatar_path} size={48} />
+                    <Avatar name={m.name} path={m.avatar_path} size={48} kind={m.kind} />
                     <div className="grow"><h3>{m.name}</h3>{m.specialty && <p className="muted small">{m.specialty}</p>}</div>
                   </button>
                 ))}
-                <p className="hint">Solo se muestran los profesionales que realizan {services.length > 1 ? 'todos estos servicios' : 'este servicio'}.</p>
+                <p className="hint">Solo se muestran los {noun.plural} disponibles para {services.length > 1 ? 'todos estos servicios' : 'este servicio'}.</p>
                 <div className="bar-bottom mobile-only"><button className="btn block" onClick={() => next(3)}>Continuar</button></div>
                 <button className="btn desktop-only" style={{ alignSelf: 'flex-start' }} onClick={() => next(3)}>Continuar</button>
               </section>
@@ -218,7 +219,7 @@ export default function BookingPage() {
                 <h1 style={{ fontSize: 26 }}>Revisa tu reserva</h1>
                 <div className="card stack" style={{ gap: 0 }}>
                   <div className="summary-row"><span>Servicio</span><span>{pkg?.name ?? services.map((s) => s.name).join(' + ')}</span></div>
-                  <div className="summary-row"><span>Profesional</span><span>{staff?.name ?? assignedStaff?.name ?? 'Cualquiera disponible'}</span></div>
+                  <div className="summary-row"><span>{noun.title}</span><span>{staff?.name ?? assignedStaff?.name ?? 'Cualquiera disponible'}</span></div>
                   <div className="summary-row"><span>Fecha</span><span>{longDay(start, tz)}</span></div>
                   <div className="summary-row"><span>Hora</span><span>{time(start, tz)} – {time(new Date(+new Date(start) + totalMin * 60000), tz)}</span></div>
                   {biz.address && <div className="summary-row"><span>Lugar</span><span>{biz.address}</span></div>}
@@ -290,7 +291,7 @@ function WaitlistModal({ biz, serviceId, staffId, date, onClose }: { biz: Busine
       ) : (
         <div className="stack">
           <h2>Lista de espera</h2>
-          <p className="muted">Te avisaremos si se libera un horario el {longDay(date + 'T12:00:00Z', 'UTC').toLowerCase()}{staff ? ` con ${staff.name.split(' ')[0]}` : ''}.</p>
+          <p className="muted">Te avisaremos si se libera un horario el {longDay(date + 'T12:00:00Z', 'UTC').toLowerCase()}{staff ? ` ${withUnit(staff.kind === 'person' ? staff.name.split(' ')[0] : staff.name, staff.kind)}` : ''}.</p>
           <div className="field"><label>¿Qué horario te sirve?</label>
             <div className="chips">{([['morning', 'Mañana'], ['afternoon', 'Tarde'], ['any', 'Cualquiera']] as const).map(([v, l]) =>
               <button key={v} className={`chip ${pref === v ? 'on' : ''}`} onClick={() => setPref(v)}>{l}</button>)}</div>

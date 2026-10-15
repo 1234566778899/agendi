@@ -71,3 +71,19 @@ export function hoursSummary(hours: { weekday: number; start: string; end: strin
   const closed = [1, 2, 3, 4, 5, 6, 7].filter((d) => !days.includes(d)).map((d) => `${weekdayShort[d - 1]} cerrado`)
   return [range, `${hm(first.start)} – ${hm(first.end)}`, ...closed].join(' · ')
 }
+
+/** Cómo llamar a "quien atiende": profesional, espacio (cancha, sala), equipo, o una mezcla */
+export function unitNoun(kinds: ('person' | 'space' | 'equipment' | undefined)[]) {
+  const set = new Set(kinds.map((k) => k ?? 'person'))
+  const k = set.size === 1 ? [...set][0] : set.size === 0 ? 'person' : 'mixed'
+  const n = {
+    person: { singular: 'profesional', plural: 'profesionales', question: '¿Con quién quieres tu cita?', any: 'Cualquier profesional disponible', anyHint: 'Te asignamos a quien tenga el horario libre.' },
+    space: { singular: 'espacio', plural: 'espacios', question: '¿Qué espacio quieres reservar?', any: 'Cualquier espacio disponible', anyHint: 'Te asignamos el que esté libre en ese horario.' },
+    equipment: { singular: 'equipo', plural: 'equipos', question: '¿Qué equipo quieres reservar?', any: 'Cualquier equipo disponible', anyHint: 'Te asignamos el que esté libre en ese horario.' },
+    mixed: { singular: 'opción', plural: 'opciones', question: '¿Qué quieres reservar?', any: 'Cualquier opción disponible', anyHint: 'Te asignamos la que esté libre en ese horario.' },
+  }[k]
+  return { ...n, title: n.singular[0].toUpperCase() + n.singular.slice(1) }
+}
+
+/** "con Andrés" para personas, "en Cancha 1" para espacios y equipos */
+export const withUnit = (name: string, kind?: string) => (!kind || kind === 'person' ? `con ${name}` : `en ${name}`)

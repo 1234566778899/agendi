@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { mediaUrl, rpc } from '../lib/supabase'
-import { duration, hoursSummary, money, openNow, phonePretty, whatsapp, longDay } from '../lib/format'
+import { duration, hoursSummary, money, openNow, phonePretty, whatsapp, longDay, unitNoun } from '../lib/format'
 import type { Business, Service } from '../lib/types'
 import { Avatar, Empty, Footer, Loading, Logo, TopBar, useBusinessTheme } from '../components/ui'
 
@@ -123,7 +123,7 @@ export default function BusinessPage() {
                   {biz.categories.map((c) => <button key={c.id} className={`chip ${cat === c.id ? 'on' : ''}`} onClick={() => setCat(c.id)}>{c.name}</button>)}
                 </div>
               )}
-              {multi && <p className="hint">Elige los servicios que quieres en la misma visita. Se agendan seguidos con el mismo profesional.</p>}
+              {multi && <p className="hint">Elige los servicios que quieres en la misma visita. Se agendan seguidos, uno tras otro.</p>}
               {grouped.length === 0 && <p className="muted">Este negocio aún no publica servicios.</p>}
               {grouped.map((g) => (
                 <div key={g.name} className="stack" style={{ gap: 8 }}>
@@ -152,14 +152,27 @@ export default function BusinessPage() {
               ))}
             </section>
 
-            {biz.staff.length > 0 && (
+            {biz.staff.some((m) => m.kind === 'person') && (
               <section className="stack">
                 <h2>Nuestro equipo</h2>
                 <div className="team">
-                  {biz.staff.map((m) => (
+                  {biz.staff.filter((m) => m.kind === 'person').map((m) => (
                     <div key={m.id} className="member">
                       <Avatar name={m.name} path={m.avatar_path} size={60} />
                       <span>{m.name.split(' ')[0]}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+            {biz.staff.some((m) => m.kind !== 'person') && (
+              <section className="stack">
+                <h2>{unitNoun(biz.staff.filter((m) => m.kind !== 'person').map((m) => m.kind)).plural.replace(/^./, (c) => c.toUpperCase())}</h2>
+                <div className="team">
+                  {biz.staff.filter((m) => m.kind !== 'person').map((m) => (
+                    <div key={m.id} className="member">
+                      <Avatar name={m.name} path={m.avatar_path} size={60} kind={m.kind} />
+                      <span>{m.name}</span>
                     </div>
                   ))}
                 </div>

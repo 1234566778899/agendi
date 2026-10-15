@@ -4,11 +4,12 @@ import { mediaUrl } from '../lib/supabase'
 import { addDays, hourOf, initials, isoWeekday, monthYear, shortTime, todayIn } from '../lib/format'
 import type { Business } from '../lib/types'
 
-export function Avatar({ name, path, size = 44 }: { name: string; path?: string | null; size?: number }) {
+export function Avatar({ name, path, size = 44, kind }: { name: string; path?: string | null; size?: number; kind?: string }) {
   const src = mediaUrl(path)
+  const icon = kind === 'space' ? '🏟️' : kind === 'equipment' ? '📦' : null
   return (
-    <div className="avatar" style={{ width: size, height: size, fontSize: size * 0.38 }} aria-hidden>
-      {src ? <img src={src} alt="" /> : initials(name)}
+    <div className="avatar" style={{ width: size, height: size, fontSize: size * (icon ? 0.46 : 0.38) }} aria-hidden>
+      {src ? <img src={src} alt="" /> : icon ?? initials(name)}
     </div>
   )
 }

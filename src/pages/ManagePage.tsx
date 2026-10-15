@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { mediaUrl, rpc } from '../lib/supabase'
-import { addDays, dayTime, longDay, money, phonePretty, time, todayIn, whatsapp } from '../lib/format'
+import { addDays, dayTime, longDay, money, phonePretty, time, todayIn, whatsapp, unitNoun, withUnit } from '../lib/format'
 import { downloadIcs, googleCalendarUrl, icsFile, outlookUrl } from '../lib/ics'
 import type { Booking, PaymentInfo } from '../lib/types'
 import { Calendar, Empty, Loading, Logo, Modal, SlotGrid, TopBar } from '../components/ui'
@@ -54,7 +54,7 @@ export default function ManagePage() {
   const calEvent = {
     title: `${serviceName} · ${b.business.name}`, start: b.starts_at, end,
     location: [b.business.address, b.business.city].filter(Boolean).join(', '),
-    description: `Reserva ${b.reference} con ${b.staff}. Gestiona tu cita: ${link}`,
+    description: `Reserva ${b.reference} ${withUnit(b.staff, b.staff_kind)}. Gestiona tu cita: ${link}`,
   }
 
   if (view === 'reschedule') return <Reschedule b={b} token={token!} onDone={() => { setView('detail'); load() }} onBack={() => setView('detail')} />
@@ -90,7 +90,7 @@ export default function ManagePage() {
           </div>
           <div className="summary-row"><span>Reserva</span><span className="ref" style={{ fontSize: 16 }}>{b.reference}</span></div>
           <div className="summary-row"><span>Servicio</span><span>{serviceName}</span></div>
-          <div className="summary-row"><span>Profesional</span><span>{b.staff}</span></div>
+          <div className="summary-row"><span>{unitNoun([b.staff_kind]).title}</span><span>{b.staff}</span></div>
           <div className="summary-row"><span>Fecha</span><span>{longDay(b.starts_at, tz)}</span></div>
           <div className="summary-row"><span>Hora</span><span>{time(b.starts_at, tz)} – {time(end, tz)}</span></div>
           <div className="summary-row"><span>Precio</span><span>{money(total)}</span></div>
@@ -197,7 +197,7 @@ function CancelModal({ b, token, onClose, onDone }: { b: Booking; token: string;
     <Modal onClose={onClose}>
       <div className="stack">
         <h2>¿Cancelar tu cita?</h2>
-        <p className="muted">{dayTime(b.starts_at, b.business.timezone)} con {b.staff}. El horario quedará libre para otra persona.</p>
+        <p className="muted">{dayTime(b.starts_at, b.business.timezone)} {withUnit(b.staff, b.staff_kind)}. El horario quedará libre para otra persona.</p>
         <div className="field"><label htmlFor="r">Motivo (opcional)</label>
           <input id="r" className="input" placeholder="Ej.: tuve un imprevisto" value={reason} onChange={(e) => setReason(e.target.value)} /></div>
         {error && <p className="error">{error}</p>}
